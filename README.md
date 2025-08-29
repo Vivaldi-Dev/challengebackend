@@ -1,5 +1,3 @@
-
-```markdown
 # 🌍 Country API - Spring Boot
 
 API RESTful para gestão de informações de países, desenvolvida em **Spring Boot** com persistência em banco relacional e containerizada com **Docker** e **Docker Compose**.
@@ -8,47 +6,84 @@ API RESTful para gestão de informações de países, desenvolvida em **Spring B
 
 ## 📌 Funcionalidades
 
-- Criar um novo país (com nome, capital, região, sub-região e área).
-- Listar todos os países cadastrados.
-- Atualizar informações de um país existente.
-- Eliminar um país.
-- Ordenar a lista de países por qualquer propriedade (`nome`, `capital`, `regiao`, `subRegiao`, `area`).
+- ✅ Criar um novo país (com nome, capital, região, sub-região e área)
+- ✅ Listar todos os países cadastrados
+- ✅ Atualizar informações de um país existente
+- ✅ Eliminar um país
+- ✅ Ordenar a lista de países por qualquer propriedade (`nome`, `capital`, `regiao`, `subRegiao`, `area`)
+- ✅ Validação para evitar países duplicados
+- ✅ Tratamento de erros com respostas apropriadas
 
 ---
 
 ## 🛠️ Tecnologias utilizadas
 
 - **Java 17**
-- **Spring Boot 3.x**
+- **Spring Boot 3.5.5**
 - **Spring Data JPA**
+- **Spring Web**
 - **Lombok**
-- **PostgreSQL** (pode ser substituído por MySQL se necessário)
-- **Docker**
-- **Docker Compose**
+- **PostgreSQL**
+- **Docker & Docker Compose**
+- **Maven**
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🚀 Como executar
 
+### 🐳 **Executar com Docker **
+
+```bash
+# 1. Executar com Docker Compose
+docker-compose up --build
+
+# 2. Ou executar em background
+docker-compose up -d --build
 ```
 
-src/main/java/com/example/demo
-│
-├── controller
-├── dto
-├── mapper
-├── model
-├── repository
-├── service
-└── service/impl
+**Serviços com Docker:**
+- 🌐 **Aplicação**: http://localhost:8080
+- 🗄️ **PostgreSQL**: localhost:5432
+- 📊 **Banco de dados**: `challenge_db`
+- 👤 **Usuário**: `postgres`
+- 🔑 **Senha**: `password`
 
-````
+---
+
+### 💻 **Executar localmente (sem Docker)**
+
+```bash
+
+CREATE DATABASE challenge_db;
+CREATE USER postgres WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE challenge_db TO postgres;
+
+
+./mvnw spring-boot:run
+```
+
+**Configuração do PostgreSQL local:**
+```properties
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/challenge_db
+spring.datasource.username=postgres
+spring.datasource.password=password
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+**Variáveis de ambiente suportadas:**
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `SPRING_JPA_HIBERNATE_DDL_AUTO`
 
 ---
 
 ## ⚡ Endpoints
 
-### Criar país
+### 📝 Criar país
 ```http
 POST /api/countries
 Content-Type: application/json
@@ -60,28 +95,26 @@ Content-Type: application/json
   "subRegiao": "África Austral",
   "area": 801590.0
 }
-````
+```
 
-### Listar todos os países
-
+### 📋 Listar todos os países
 ```http
 GET /api/countries
 ```
 
-### Listar países ordenados por uma propriedade
-
+### 🔍 Listar países ordenados
 ```http
 GET /api/countries?sortBy=nome
+GET /api/countries?sortBy=capital
+GET /api/countries?sortBy=area
 ```
 
-### Buscar país por ID
-
+### 🔎 Buscar país por ID
 ```http
 GET /api/countries/{id}
 ```
 
-### Atualizar país
-
+### ✏️ Atualizar país
 ```http
 PUT /api/countries/{id}
 Content-Type: application/json
@@ -89,36 +122,57 @@ Content-Type: application/json
 {
   "nome": "Brasil",
   "capital": "Brasília",
-  "regiao": "América",
-  "subRegiao": "América do Sul",
+  "regiao": "América do Sul",
+  "subRegiao": "América Latina",
   "area": 8515767.0
 }
 ```
 
-### Deletar país
-
+### 🗑️ Deletar país
 ```http
 DELETE /api/countries/{id}
 ```
 
 ---
 
-## ⚙️ Docker & Docker Compose
+## 📊 Exemplo de Respostas
 
-* Para rodar o projeto com Docker:
-
-```bash
-docker-compose up --build
+### ✅ Sucesso (201 Created):
+```json
+{
+  "id": 1,
+  "nome": "Brasil",
+  "capital": "Brasília",
+  "regiao": "América do Sul",
+  "subRegiao": "América Latina",
+  "area": 8515767.0
+}
 ```
 
-* Serviço da aplicação acessível em: `http://localhost:8080`
-* Banco de dados PostgreSQL em: `localhost:5432`
+### ❌ Conflito (409 Conflict):
+```json
+{
+  "timestamp": "2024-01-15T10:00:00.000",
+  "status": 409,
+  "error": "Conflict",
+  "message": "Country with the same name already exists",
+  "path": "/api/countries"
+}
+```
+
+### ❌ Não encontrado (404 Not Found):
+```json
+{
+  "timestamp": "2024-01-15T10:00:00.000",
+  "status": 404,
+  "error": "Not Found",
+  "message": "País não encontrado",
+  "path": "/api/countries/999"
+}
+```
+
+## 👨‍💻 Desenvolvido por
+
+Vivaldi Afonso Nobela Jr - nobelavivaldi@gmail.com
 
 ---
-
-## 📄 Observações
-
-* Validações de dados são aplicadas ao criar e atualizar países.
-* Mensagens de erro são retornadas quando um país já existe ou quando campos obrigatórios estão ausentes.
-
-
